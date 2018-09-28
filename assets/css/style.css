@@ -11,6 +11,12 @@
         max-height: 100px !important;
     }
 
+    body{
+        background: url('../images/waves-small.jpg') !important;
+        background-repeat: no-repeat;
+        background-size: cover;
+    }
+
   }
 
 html, body{
@@ -18,7 +24,7 @@ html, body{
 }
 
 body{
-    background: url('../images/waves.jpg');
+    background: url('../images/waves-big.jpg');
     background-repeat: no-repeat;
     background-size: cover;
     color: white;
