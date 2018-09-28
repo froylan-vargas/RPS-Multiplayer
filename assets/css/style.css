@@ -1,3 +1,64 @@
-body{
-    background-color: green;
+
+@media screen and (max-width: 576px) {
+   
+    .options{
+        min-height: 100px !important;
+        max-height: 100px !important;
+    }
+
+  }
+
+html, body{
+    height: 100%;
+}
+
+.wrapper{
+    height: 100%;
+}
+
+header{  
+    border-bottom: 1px solid black;
+    height: 100px;
+    /*margin-bottom: 20px;*/
+}
+
+.mainScreen{
+    height: calc(100% - 100px);
+}
+
+.bootRow{
+    margin: 0px !important;
+}
+
+.rowDirection{
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
+}
+
+.columnDirection{
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+
+
+.inputText{
+    font-size: 1rem;
+    background-color: #fff;
+    border: 1px solid #ced4da;
+    border-radius: .25rem;
+    padding: .375rem .75rem;
+    margin: 20px 0px;
+}
+
+.options{
+    max-height: 250px;
+    min-height: 250px;
+    cursor: pointer;
 }

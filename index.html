@@ -1,19 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Rock Paper Scissors</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
-    crossorigin="anonymous">
+        crossorigin="anonymous">
     <link rel="stylesheet" href="./assets/css/style.css">
 </head>
+
 <body>
 
-    <h1 class="text-right">Hello from Rock Paper Scissors</h1>
+    <div class="wrapper">
+        <header>
+
+            <div class="row bootRow" style="height:100px;">
+                <div class="col-8 rowDirection">
+                    <h1 class="m-0">Rock Paper Scissors</h1>
+                </div>
+                <div class="col-4 rowDirection">
+                    <span id="userLabel"></span>
+                </div>
+            </div>
+
+
+        </header>
+
+        <section class="mainScreen">
+            <div id="playerInfo" class="columnDirection">
+                <span>What is your player name?</span>
+                <input id="nameInput" class="inputText" type="text" placeholder="e.g. papuchi">
+                <button id="playButton" type="button" class="btn btn-success">Play!</button>
+            </div>
+
+            <div id="rpsArea" style="display:block">
+                <h2 class="text-center">Choose an option</h2>
+                <div class="row bootRow text-center">
+                    <div class="col-4">
+                        <img class="options img-fluid" src="./assets/images/rock.png" alt="rock image" data-value="rock">
+                    </div>
+                    <div class="options col-4">
+                        <img class="options img-fluid" src="./assets/images/paper.png" alt="paper image" data-value="paper">
+                    </div>
+                    <div class="options col-4">
+                        <img class="options img-fluid" src="./assets/images/scissors.png" alt="scissors image" data-value="scissors">
+                    </div>
+                </div>
+                <div class="row bootRow">
+                    <div class="col-12">
+                        More coming...
+                    </div>
+                </div>
+            </div>
+
+        </section>
+    </div>
+
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="./assets/javascript/app.js"></script>
 </body>
+
 </html>
