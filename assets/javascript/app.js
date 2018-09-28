@@ -13,6 +13,7 @@ $(document).ready(function () {
             $('#userLabel').text(`Hello ${playerName}`);
             $('#playerInfo').hide();
             $('#rpsArea').show();
+            $('#chatArea').show();
         } else {
             $('#playerInfo').show();
         }
@@ -26,6 +27,7 @@ $(document).ready(function () {
             $('#userLabel').text(`Hello ${playerName}`);
             $('#playerInfo').hide();
             $('#rpsArea').show();
+            $('#chatArea').show();
         } else {
             alert("You must enter a player name");
         }
