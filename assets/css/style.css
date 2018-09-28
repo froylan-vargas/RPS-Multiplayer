@@ -12,9 +12,7 @@
     }
 
     body{
-        background: url('../images/waves-small.jpg') !important;
-        background-repeat: no-repeat !important;
-        background-size: cover !important;
+        background: gray !important;
     }
 
   }
