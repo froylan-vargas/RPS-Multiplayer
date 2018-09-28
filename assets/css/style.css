@@ -6,20 +6,33 @@
         max-height: 100px !important;
     }
 
+    .selectedImage{
+        min-height: 100px !important;
+        max-height: 100px !important;
+    }
+
   }
 
 html, body{
     height: 100%;
 }
 
+body{
+    background: url('../images/waves.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+    color: white;
+}
+
 .wrapper{
     height: 100%;
+    background: rgb(0, 0, 0);
+    background: rgba(0, 0, 0, .4);
 }
 
 header{  
-    border-bottom: 1px solid black;
+    margin-bottom: 20px;
     height: 100px;
-    /*margin-bottom: 20px;*/
 }
 
 .mainScreen{
@@ -58,7 +71,67 @@ header{
 }
 
 .options{
-    max-height: 250px;
-    min-height: 250px;
+    max-height: 150px;
+    min-height: 150px;
     cursor: pointer;
 }
+
+.selectedImage{
+    min-height: 100px;
+    max-height: 100px;
+}
+
+.hostMessage, .oponentMessage{
+    margin: 0px;
+    font-weight: bolder;
+}
+
+.hostMessage{
+    color: #0000ff;
+}
+
+.oponentMessage{
+    color: #66ff33;
+}
+
+.section{
+    border: 3px solid #ff33cc;
+    border-radius: 20px;
+    padding: 15px 0;
+    margin-bottom: 20px;
+    background: rgb(230, 238, 255);
+    background: rgba(230, 238, 255, .5);
+}
+
+#chat{
+    border-radius: 15px;
+    padding-left: 20px;
+    margin-right: 10px;
+    height: 192px;
+    overflow-y: auto; 
+}
+
+::-webkit-scrollbar{
+    height: 4px;
+    width: 12px;
+    background: #66ff33;
+}
+
+::-webkit-scrollbar-thumb:vertical{
+    background: #0000ff;
+    border-radius: 10px;
+}
+
+
+#messageArea{
+    justify-content: center;
+}
+
+#messageInput{
+    border-radius: 15px;
+}
+
+#sendMessageButton{
+    border-radius: 15px;
+}
+
