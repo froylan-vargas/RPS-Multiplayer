@@ -10,21 +10,19 @@
         min-height: 100px !important;
         max-height: 100px !important;
     }
-
-
   }
 
-  *{
-     box-sizing: border-box;
-  }
+*{
+    box-sizing: border-box;
+}
 
-  html, body{
+html, body{
     height: auto;
 }
 
 body {
     background: url('../images/waves-big.jpg') !important;
-    background-repeat: repeat-y !important;
+    background-repeat: no-repeat !important;
     background-size: cover !important;
     
 }
@@ -49,10 +47,9 @@ header{
 }
 
 #playerInfo{
-    height: calc(100% - 100px);
-    background: url('../images/waves-big.jpg');
-    background-repeat: no-repeat;
-    background-size: cover;
+    height: calc(100vh - 100px);
+    background: rgb(0, 0, 0);
+    background: rgba(0, 0, 0, .5);
     color: white;
 }
 
@@ -79,7 +76,9 @@ header{
     flex-direction: column;
 }
 
-
+#optionsDiv{
+    color: #0000ff;
+}
 
 .inputText{
     font-size: 1rem;
@@ -94,6 +93,16 @@ header{
     max-height: 150px;
     min-height: 150px;
     cursor: pointer;
+}
+
+#gameResults{
+    color: #66ff33;
+    font-weight: bolder;
+}
+
+#gameResult{
+    color: #0000ff;
+    font-weight: bolder;
 }
 
 .selectedImage{
