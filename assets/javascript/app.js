@@ -11,6 +11,7 @@ $(document).ready(function () {
         var playerName = localStorage.getItem('playerName');
         if (playerName){
             $('#userLabel').text(`Hello ${playerName}`);
+            $("#gameContainer").show();
             $('#playerInfo').hide();
             $('#rpsArea').show();
             $('#chatArea').show();
@@ -24,7 +25,8 @@ $(document).ready(function () {
         var playerName = $('#nameInput').val().trim();
         if(playerName.length){
             localStorage.setItem('playerName', playerName);
-            $('#userLabel').text(`Hello ${playerName}`);
+            $('#userLabel').text(`Hello${playerName}`);
+            $("#gameContainer").show();
             $('#playerInfo').hide();
             $('#rpsArea').show();
             $('#chatArea').show();

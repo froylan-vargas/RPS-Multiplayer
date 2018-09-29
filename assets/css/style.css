@@ -11,41 +11,49 @@
         max-height: 100px !important;
     }
 
-    body{
-        background: gray !important;
-    }
-
-    html{
-        background: gray !important;
-    }
 
   }
 
-html, body{
-    height: 100%;
+  *{
+     box-sizing: border-box;
+  }
+
+  html, body{
+    height: auto;
 }
 
-body{
+body {
+    background: url('../images/waves-big.jpg') !important;
+    background-repeat: repeat-y !important;
+    background-size: cover !important;
+    
+}
+
+
+
+header{  
+    height: 100px;
+    color: white;
+    border-bottom: 1px solid white;
+    background: rgb(0, 0, 0);
+    background: rgba(0, 0, 0, .5);
+}
+
+.container-fluid{
+    height: calc(100vh - 100px); 
+    overflow: auto;
+    background: rgb(0, 0, 0);
+    background: rgba(0, 0, 0, .5);
+    padding-top: 20px;
+    clear: both;
+}
+
+#playerInfo{
+    height: calc(100% - 100px);
     background: url('../images/waves-big.jpg');
     background-repeat: no-repeat;
     background-size: cover;
     color: white;
-}
-
-.wrapper{
-    height: 100%;
-    background: rgb(0, 0, 0);
-    background: rgba(0, 0, 0, .4);
-}
-
-header{  
-    margin-bottom: 20px;
-    height: 100px;
-    border-bottom: 1px solid white;
-}
-
-.container{
-    height: calc(100% - 120px);
 }
 
 .mainScreen{
@@ -65,7 +73,6 @@ header{
 }
 
 .columnDirection{
-    height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -108,10 +115,10 @@ header{
 }
 
 .section{
+    margin-bottom: 20px;
     border: 3px solid #ff33cc;
     border-radius: 20px;
     padding: 15px 0;
-    margin-bottom: 20px;
     background: rgb(230, 238, 255);
     background: rgba(230, 238, 255, .5);
 }
