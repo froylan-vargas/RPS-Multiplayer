@@ -2,6 +2,7 @@
 $(document).ready(function () {
 
     var isHostChoose = false;
+    var playerName = '';
 
     function start() {
         gettingStoredPlayerName();
@@ -10,7 +11,7 @@ $(document).ready(function () {
     //Display
 
     function gettingStoredPlayerName() {
-        var playerName = localStorage.getItem('playerName');
+        playerName = localStorage.getItem('playerName');
         if (playerName) {
             displayAfterPlayerName(playerName);
         } else {
@@ -28,7 +29,7 @@ $(document).ready(function () {
 
     //Handlers
     function playHandler() {
-        var playerName = $('#nameInput').val().trim();
+        playerName = $('#nameInput').val().trim();
         if (playerName.length) {
             localStorage.setItem('playerName', playerName);
             displayAfterPlayerName(playerName);
@@ -52,9 +53,38 @@ $(document).ready(function () {
         }
     }
 
+    function sendMessageHandler(){
+        var message = getInputValue('messageInput');
+        var chat = $('#chat');
+        if (message){
+          var newMessage = createMessageElement(message);
+          cleanInputValue('messageInput');
+          chat.append(newMessage);
+        } 
+    }
+
     //Helpers
+    function createMessageElement(message, isHost = true){
+        var newMessage = $('<p>');
+        newMessage.text(`${playerName}: ${message}`);
+        if (isHost){
+            newMessage.addClass('hostMessage');
+        } else {
+            newMessage.addClass('oponentMessage');
+        }
+        return newMessage;
+    }
+
+    function cleanInputValue(element){
+        $(`#${element}`).val('');
+    }
+
     function setAttribute(element, attr, value) {
         $(element).attr(attr, value);
+    }
+
+    function getInputValue(element){
+        return $(`#${element}`).val();
     }
 
     function changeText(element,value){
@@ -93,6 +123,9 @@ $(document).ready(function () {
 
     //Bindings
     $('#playButton').on('click', playHandler);
-    $('.options').on('click', userChoiceHandler)
+    $('#sendMessageButton').on('click', sendMessageHandler);
+    $('.options').on('click', userChoiceHandler);
+    
+    //GameEvents
     start();
 });
