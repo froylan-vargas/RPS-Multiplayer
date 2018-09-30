@@ -1,6 +1,7 @@
 var isHost = false;
 var playerName = '';
 var currentGameKey = '';
+var currentModality = '';
 
 function start() {
     show('playerInfo');
@@ -60,6 +61,10 @@ function sendMessageHandler() {
     }
 }
 
+function endGameHandler(){
+    console.log('Im here');
+}
+
 //fireBaseHandlers
 function actionsConnected(connections) {
     connections.forEach(connection => {
@@ -84,10 +89,9 @@ function actionsConnectionLost(connection) {
 }
 
 function actionsGameCreated(game) {
-    if (isHost && userKey === game.val().host.id) {
-        currentGameKey = game.key;
-    } else if (userKey === game.val().opponent.id) {
-        currentGameKey = game.key;
+    if (isHost && userKey === game.val().host.id
+        || userKey === game.val().opponent.id) {
+        gameCreatedAssignments(game);
     }
 }
 
@@ -103,6 +107,9 @@ function actionsUserSelection(game) {
             ValidateWinner(hostChoice, opponentChoice);
             updateRecord(`/games/${currentGameKey}/hostChoice`, '');
             updateRecord(`/games/${currentGameKey}/opponentChoice`, '');
+            if (currentModality === 'one'){
+                show("endGameButton");
+            }
         } else if (hostChoice && isHost) {
             displayUserChoiceActions();
             setAttribute('#hostChoice', 'src', `./assets/images/${hostChoice}.png`);
@@ -186,6 +193,11 @@ function getAttribute(element, attr) {
     return $(element).attr(attr);
 }
 
+function gameCreatedAssignments(game) {
+    currentGameKey = game.key;
+    currentModality = game.val().modality;
+}
+
 function ValidateWinner(hostChoice, enemyChoice) {
     var hostResult = '';
     var opponentResult = '';
@@ -255,4 +267,5 @@ start();
 $(document).ready(start);
 $('#playButton').on('click', enterHandler);
 $('#sendMessageButton').on('click', sendMessageHandler);
+$('#endGameButton').on('click', endGameHandler);
 $('.options').on('click', userChoiceHandler);
