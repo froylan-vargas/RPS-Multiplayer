@@ -24,10 +24,7 @@ body {
     background: url('../images/waves-big.jpg') !important;
     background-repeat: no-repeat !important;
     background-size: cover !important;
-    
 }
-
-
 
 header{  
     height: 100px;
@@ -47,7 +44,7 @@ header{
     padding-right: 30px !important;
 }
 
-#playerInfo{
+.startScreensWrapper{
     height: calc(100vh - 100px);
     background: rgb(0, 0, 0);
     background: rgba(0, 0, 0, .5);
@@ -88,6 +85,18 @@ header{
     border-radius: .25rem;
     padding: .375rem .75rem;
     margin: 20px 0px;
+}
+
+.userAvailableName{
+    padding: 10px 20px;
+    background: rgb(230, 238, 255);
+    background: rgba(230, 238, 255, .5);
+    color: #0000ff;
+    border-radius: 20px;
+    font-weight: bolder;
+    min-width: 100px;
+    max-width: 100px;
+    text-align: center
 }
 
 .options{

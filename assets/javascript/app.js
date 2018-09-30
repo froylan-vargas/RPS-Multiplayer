@@ -1,197 +1,258 @@
-$(document).ready(function () {
+var isHost = false;
+var playerName = '';
+var currentGameKey = '';
 
-    var config = {
-        apiKey: "AIzaSyAgZHBWeEp1QXA8tqDh-kq43cnvFj4Ih1k",
-        authDomain: "rps-multiplayer-c0ef6.firebaseapp.com",
-        databaseURL: "https://rps-multiplayer-c0ef6.firebaseio.com",
-        projectId: "rps-multiplayer-c0ef6",
-        storageBucket: "rps-multiplayer-c0ef6.appspot.com",
-        messagingSenderId: "289792024556"
-    };
+function start() {
+    show('playerInfo');
+}
 
-    firebase.initializeApp(config);
-    var database = firebase.database();
-
-    var connectionsRef = database.ref("/connections");
-    var connectedRef = database.ref(".info/connected");
-    var userKey;
-    var isHostChoose = false;
-    var playerName = '';
-
-    connectedRef.on("value", function (snap) {
-        if (snap.val()) {
-            var con = connectionsRef.push(true);
-            userKey = con.key;
-            con.onDisconnect().remove();
-        }
-    });
-
-    database.ref(`/connections`).on("child_changed", function(snap){
-        console.log('added');
-        var users = $("#users");
-        if(snap.val().playerName){
-            if(snap.val().playerName !== playerName){
-                var newUser = $('<p>').text(snap.val().playerName);
-                users.append(newUser);
-            }
-        }
-    });
-
-    database.ref(`/connections`).on("child_removed", function(snap){
-        console.log(snap.val());
-        
-    });
-
-    database.ref('/connections').once("value", function(snap){
-        console.log('once');
-        var users = $("#users");
-        snap.forEach(connection => {
-            if(connection.val().playerName){
-                if(connection.val().playerName !== playerName){
-                    var newUser = $('<p>').text(connection.val().playerName);
-                    users.append(newUser);
-                }
-            }
-        });
-    })
-
-    
-
-    function playTestHandler() {
-        playerName = $('#nameInput').val().trim();
-        database.ref(`/connections/${userKey}`).set({
+//Handlers
+function enterHandler() {
+    playerName = $('#nameInput').val().trim();
+    if (playerName.length) {
+        displayAfterEnter(playerName);
+        updateRecord(`/connections/${userKey}`, {
             playerName,
             available: true
-          });
+        });
+    } else {
+        alert("You must enter a player name");
     }
+}
 
-    
-    function start() {
-        gettingStoredPlayerName();
+function playHandler() {
+    isHost = true;
+    var opponentKey = $(this)[0].parentElement.getAttribute("data-value");
+    var opponentName = $(`div[data-value='${opponentKey}'] span`).text();
+    var modality = $(`div[data-value='${opponentKey}'] select`).val();
+
+    updateRecord(`/connections/${userKey}`, {
+        available: false
+    });
+    updateRecord(`/connections/${opponentKey}`, {
+        available: false
+    });
+
+    var game = createGameObject(userKey, opponentKey, modality);
+    pushRecord("/games", game);
+}
+
+function userChoiceHandler() {
+    var selectedValue = getAttribute(this, 'data-value');
+    if (isHost) {
+        updateRecord(`/games/${currentGameKey}/hostChoice`, selectedValue);
+    } else {
+        updateRecord(`/games/${currentGameKey}/opponentChoice`, selectedValue);
     }
+    updateRecord(`/games/${currentGameKey}/change`, 'game');
+}
 
-    //Display
-
-    function gettingStoredPlayerName() {
-        /*playerName = localStorage.getItem('playerName');
-        if (playerName) {
-            displayAfterPlayerName(playerName);
-        } else {
-            show('playerInfo');
-        }*/
-        show('playerInfo');
+function sendMessageHandler() {
+    var message = getInputValue('messageInput');
+    if (message) {
+        updateRecord(`/games/${currentGameKey}/chat`, {
+            lastMessage: message,
+            isHost,
+            playerName
+        });
+        updateRecord(`/games/${currentGameKey}/change`, 'chat');
+        cleanInputValue('messageInput');
     }
+}
 
-    function displayAfterPlayerName(playerName) {
-        changeText('userLabel', `Hello ${playerName}`);
-        show("gameContainer");
-        show('rpsArea');
-        show('chatArea');
-        hide('playerInfo');
+//fireBaseHandlers
+function actionsConnected(connections) {
+    connections.forEach(connection => {
+        if (connection.val().playerName)
+            createOpponentElement(connection);
+    });
+}
+
+function actionsConnectionUpdated(connection) {
+    if (connection.val().playerName !== playerName
+        && connection.val().available) {
+        createOpponentElement(connection);
+    } else if (!connection.val().available) {
+        destroyOpponentElement(connection);
+        if (connection.key === userKey)
+            displayAfterOpponentSelected();
     }
+}
 
-    //Handlers
-    
+function actionsConnectionLost(connection) {
+    destroyOpponentElement(connection);
+}
 
-    function playHandler() {
-        playerName = $('#nameInput').val().trim();
-        if (playerName.length) {
-            localStorage.setItem('playerName', playerName);
-            displayAfterPlayerName(playerName);
-        } else {
-            alert("You must enter a player name");
+function actionsGameCreated(game) {
+    if (isHost && userKey === game.val().host.id) {
+        currentGameKey = game.key;
+    } else if (userKey === game.val().opponent.id) {
+        currentGameKey = game.key;
+    }
+}
+
+function actionsUserSelection(game) {
+    if (game.key === currentGameKey) {
+        updateRecord(`/games/${currentGameKey}/change`, '');
+        const { hostChoice, opponentChoice } = game.val();
+
+        if (hostChoice && opponentChoice) {
+            displayUserChoiceActions();
+            setAttribute('#hostChoice', 'src', `./assets/images/${hostChoice}.png`);
+            setAttribute('#oponentChoice', 'src', `./assets/images/${opponentChoice}.png`);
+            ValidateWinner(hostChoice, opponentChoice);
+            updateRecord(`/games/${currentGameKey}/hostChoice`, '');
+            updateRecord(`/games/${currentGameKey}/opponentChoice`, '');
+        } else if (hostChoice && isHost) {
+            displayUserChoiceActions();
+            setAttribute('#hostChoice', 'src', `./assets/images/${hostChoice}.png`);
+        } else if (opponentChoice && !isHost) {
+            displayUserChoiceActions();
+            setAttribute('#oponentChoice', 'src', `./assets/images/${opponentChoice}.png`);
         }
     }
+}
 
-    function userChoiceHandler() {
-        var selectedValue = getAttribute(this, 'data-value');
-        var hostElement = '#hostChoice';
-        if (!isHostChoose) {
-            isHostChoose = true;
-            show('selectionsDiv');
-            setAttribute(hostElement, 'src', `./assets/images/${selectedValue}.png`);
-            setAttribute(hostElement, 'data-value', selectedValue);
-        } else {
-            const hostChoice = getAttribute(hostElement, 'data-value');
-            setAttribute('#oponentChoice', 'src', `./assets/images/${selectedValue}.png`);
-            ValidateWinner(hostChoice, selectedValue);
-        }
+function actionsChatMessage(game) {
+    if (game.key === currentGameKey) {
+        updateRecord(`/games/${currentGameKey}/change`, '');
+        var chatArea = $('#chat');
+        const { lastMessage, isHost, playerName } = game.val().chat;
+        var newMessage = createMessageElement(lastMessage, isHost, playerName);
+        cleanInputValue('messageInput');
+        chatArea.append(newMessage);
     }
+}
 
-    function sendMessageHandler() {
-        var message = getInputValue('messageInput');
-        var chat = $('#chat');
-        if (message) {
-            var newMessage = createMessageElement(message);
-            cleanInputValue('messageInput');
-            chat.append(newMessage);
-        }
+//destroyElements
+function destroyOpponentElement(connection) {
+    const { key } = connection;
+    $(`div[data-value='${key}']`).remove();
+}
+
+//createElements
+function createOpponentElement(connection) {
+    var key = connection.key;
+    var opponentDiv = $('<div>').addClass("mb-3 rowDirection").attr("data-value", key);
+    var userName = $('<span>').addClass("userAvailableName mr-5").text(connection.val().playerName);
+    var oneOption = $('<option>').text("One Game").attr("value", "one");
+    var twoOthreeOption = $('<option>').text("Two out of three").attr("value", "twoOthree");
+    var modalitySelect = $('<select>').addClass("mr-5");
+    modalitySelect.append(oneOption, twoOthreeOption);
+    var playButton = $('<button>').addClass("btn btn-success").text("Play!").attr("type", "button")
+        .on("click", playHandler);
+    opponentDiv.append(userName, modalitySelect, playButton);
+    $('#oponentsList').append(opponentDiv);
+}
+
+function createMessageElement(message, isHost, playerName) {
+    var newMessage = $('<p>');
+    newMessage.text(`${playerName}: ${message}`);
+    if (isHost) {
+        newMessage.addClass('hostMessage');
+    } else {
+        newMessage.addClass('oponentMessage');
     }
+    return newMessage;
+}
 
-    //Helpers
-    function createMessageElement(message, isHost = true) {
-        var newMessage = $('<p>');
-        newMessage.text(`${playerName}: ${message}`);
-        if (isHost) {
-            newMessage.addClass('hostMessage');
-        } else {
-            newMessage.addClass('oponentMessage');
-        }
-        return newMessage;
+
+//Helpers
+function cleanInputValue(element) {
+    $(`#${element}`).val('');
+}
+
+function setAttribute(element, attr, value) {
+    $(element).attr(attr, value);
+}
+
+function getInputValue(element) {
+    return $(`#${element}`).val();
+}
+
+function changeText(element, value) {
+    $(`#${element}`).text(value);
+}
+
+function show(element) {
+    $(`#${element}`).show();
+}
+
+function hide(element) {
+    $(`#${element}`).hide();
+}
+
+function getAttribute(element, attr) {
+    return $(element).attr(attr);
+}
+
+function ValidateWinner(hostChoice, enemyChoice) {
+    var hostResult = '';
+    var opponentResult = '';
+    if ((hostChoice === 'rock' && enemyChoice === 'scissors')
+        || (hostChoice === 'paper' && enemyChoice === 'rock')
+        || (hostChoice === 'scissors' && enemyChoice === 'paper')) {
+        hostResult = 'You win';
+        opponentResult = 'You loose';
+    } else if (hostChoice === enemyChoice) {
+        hostResult = 'Tide Game';
+        opponentResult = 'Tide Game';
+    } else {
+        hostResult = 'You lose!';
+        opponentResult = 'You win';
     }
+    isHost ? printGameResult(hostResult) : printGameResult(opponentResult);
+}
 
-    function cleanInputValue(element) {
-        $(`#${element}`).val('');
+function createGameObject(userKey, opponentKey, modality) {
+    return {
+        modality,
+        hostChoice: '',
+        opponentChoice: '',
+        host: {
+            id: userKey,
+        },
+        opponent: {
+            id: opponentKey,
+        },
+        chat: {
+            isHost: false,
+            playerName: '',
+            lastMessage: ''
+        },
+        change: ''
     }
+}
 
-    function setAttribute(element, attr, value) {
-        $(element).attr(attr, value);
-    }
+//Display
+function displayAfterOpponentSelected() {
+    show("gameContainer");
+    show('rpsArea');
+    show('chatArea');
+    hide('availableOponents');
+}
 
-    function getInputValue(element) {
-        return $(`#${element}`).val();
-    }
+function displayAfterEnter() {
+    changeText('userLabel', `Hello ${playerName}`);
+    show('availableOponents');
+    hide('playerInfo');
+}
 
-    function changeText(element, value) {
-        $(`#${element}`).text(value);
-    }
+function printGameResult(message) {
+    $('#gameResult').text(message);
+}
 
-    function show(element) {
-        $(`#${element}`).show();
-    }
+function displayUserChoiceActions() {
+    hide('optionsDiv');
+    show('selectionsDiv');
+    printGameResult("Waiting for opponent...")
+}
 
-    function hide(element) {
-        $(`#${element}`).hide();
-    }
+//GameEvents
+start();
 
-    function getAttribute(element, attr) {
-        return $(element).attr(attr);
-    }
-
-    function ValidateWinner(hostChoice, enemyChoice) {
-        var result = '';
-        if ((hostChoice === 'rock' && enemyChoice === 'scissors')
-            || (hostChoice === 'paper' && enemyChoice === 'rock')
-            || (hostChoice === 'scissors' && enemyChoice === 'paper')) {
-            result = 'You win';
-        } else if (hostChoice === enemyChoice) {
-            result = 'Tide Game';
-        } else {
-            result = 'You lose!'
-        }
-        printGameResult(result);
-    }
-
-    function printGameResult(message) {
-        $('#gameResult').text(message);
-    }
-
-    //Bindings
-    //$('#playButton').on('click', playHandler);
-    $('#playButton').on('click', playTestHandler);
-    $('#sendMessageButton').on('click', sendMessageHandler);
-    $('.options').on('click', userChoiceHandler);
-
-    //GameEvents
-    start();
-});
+//Bindings
+$(document).ready(start);
+$('#playButton').on('click', enterHandler);
+$('#sendMessageButton').on('click', sendMessageHandler);
+$('.options').on('click', userChoiceHandler);

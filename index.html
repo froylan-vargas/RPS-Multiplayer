@@ -12,8 +12,6 @@
 </head>
 
 <body>
-
-
     <header>
         <div class="row bootRow" style="height:100px;">
             <div class="col-8 rowDirection">
@@ -25,17 +23,23 @@
         </div>
     </header>
 
-    <div id="playerInfo">
+    <div id="playerInfo" class="startScreensWrapper">
         <section class="mainScreen columnDirection">
             <span>What is your player name?</span>
             <input id="nameInput" class="inputText" type="text" placeholder="e.g. papuchi">
-            <button id="playButton" type="button" class="btn btn-success">Play!</button>
-            <div id="users">
-                
+            <button id="playButton" type="button" class="btn btn-success">Enter!</button>
+            <div id="users">                
             </div>
         </section>
     </div>
 
+    <div id="availableOponents" class="startScreensWrapper" style="display:none">
+        <section class="mainScreen columnDirection">
+            <h2 style="color:#66ff33">Select an opponent</h2>
+            <div id="oponentsList">
+            </div>
+        </section>
+    </div>
 
     <div id="gameContainer" style="display:none" class="container-fluid">
         <div id="rpsArea" style="display:none">
@@ -58,20 +62,18 @@
             <div id="selectionsDiv" style="display:none" class="section">
                 <div id="gameResults" class="row bootRow text-center">
                     <div class="col-4">
-                        <p>You:</p>
+                        <p id="userLeft"></p>
                         <img class="selectedImage img-fluid" id="hostChoice">
                     </div>
                     <div class="col-4 columnDirection">
                         <p id="gameResult"></p>
                     </div>
                     <div class="col-4">
-                        <p>Opponent:</p>
+                        <p id="userRight"></p>
                         <img class="selectedImage img-fluid" id="oponentChoice">
                     </div>
                 </div>
             </div>
-
-
         </div>
 
         <div id="chatArea" style="display:none" class="section">
@@ -85,21 +87,14 @@
                 <div class="col-sm-2 col-3 p-0">
                     <button id="sendMessageButton" type="button" class="form-control btn btn-success">Send...</button>
                 </div>
-
-
             </div>
-
         </div>
-
-
     </div>
-
-
-
 
     <script src="https://www.gstatic.com/firebasejs/5.5.2/firebase.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="./assets/javascript/firebaseHelpers.js"></script>
     <script src="./assets/javascript/app.js"></script>
+    
 </body>
-
 </html>
