@@ -17,7 +17,7 @@
 }
 
 html, body{
-    height: auto;
+    height: 100%;
 }
 
 body {
@@ -35,7 +35,7 @@ header{
 }
 
 .container-fluid{
-    height: calc(100vh - 100px); 
+    height: calc(100% - 100px); 
     overflow: auto;
     background: rgb(0, 0, 0);
     background: rgba(0, 0, 0, .5);
@@ -45,7 +45,8 @@ header{
 }
 
 .startScreensWrapper{
-    height: calc(100vh - 100px);
+    height: calc(100% - 100px);
+    overflow: auto;
     background: rgb(0, 0, 0);
     background: rgba(0, 0, 0, .5);
     color: white;
@@ -100,8 +101,8 @@ header{
 }
 
 .options{
-    max-height: 150px;
-    min-height: 150px;
+    max-height: 100px;
+    min-height: 100px;
     cursor: pointer;
 }
 

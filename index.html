@@ -35,7 +35,7 @@
 
     <div id="availableOponents" class="startScreensWrapper" style="display:none">
         <section class="mainScreen columnDirection">
-            <h2 style="color:#66ff33">Select an opponent</h2>
+            <h2 id="selectOpponentText" style="color:#66ff33">Select an oponent</h2>
             <div id="oponentsList">
             </div>
         </section>
@@ -67,7 +67,9 @@
                     </div>
                     <div class="col-4 columnDirection">
                         <p id="gameResult"></p>
-                        <button id="nextGameButton" style="display:none" type="button" class="btn btn-success">Next</button>
+                        <p id="wins"></p>
+                        <p id="losts"></p>
+                        <button id="nextGameButton" style="display:none" type="button" class="btn btn-success mb-2">Next Game</button>
                         <button id="endGameButton" style="display:none" type="button" class="btn btn-success">End Game</button>
                     </div>
                     <div class="col-4">

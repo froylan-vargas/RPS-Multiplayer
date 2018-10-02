@@ -24,7 +24,6 @@ function enterHandler() {
 function playHandler() {
     isHost = true;
     var opponentKey = $(this)[0].parentElement.getAttribute("data-value");
-    var opponentName = $(`div[data-value='${opponentKey}'] span`).text();
     var modality = $(`div[data-value='${opponentKey}'] select`).val();
 
     updateRecord(`/connections/${userKey}`, {
@@ -61,8 +60,17 @@ function sendMessageHandler() {
     }
 }
 
-function endGameHandler(){
-    console.log('Im here');
+function endGameHandler() {
+    removeRecord(`/games/${currentGameKey}`);
+}
+
+function nextGameHandler(){
+    setAttribute('.selectedImage','src','');
+    changeText('gameResult', '');
+    hide('endGameButton');
+    hide('nextGameButton');
+    hide('selectionsDiv');
+    show('optionsDiv');
 }
 
 //fireBaseHandlers
@@ -88,6 +96,25 @@ function actionsConnectionLost(connection) {
     destroyOpponentElement(connection);
 }
 
+function getDisconnectionInfo(connection) {
+    var returnId = '';
+    var userinGame = false;
+    if (currentGameKey) {
+        var connectionKey = connection.key;
+        var currentGame = getRecord(`/games/${currentGameKey}`);
+        var hostId = currentGame.val().host.id;
+        var opponentId = currentGame.val().opponent.id;
+        if (hostId === connectionKey) {
+            userinGame = true;
+            returnId = opponentId;
+        } else if (opponentId === connectionKey) {
+            userinGame = true;
+            returnId = hostId;
+        }
+    }
+    return { isUserInGame: userinGame, opponentId: returnId };
+}
+
 function actionsGameCreated(game) {
     if (isHost && userKey === game.val().host.id
         || userKey === game.val().opponent.id) {
@@ -104,12 +131,9 @@ function actionsUserSelection(game) {
             displayUserChoiceActions();
             setAttribute('#hostChoice', 'src', `./assets/images/${hostChoice}.png`);
             setAttribute('#oponentChoice', 'src', `./assets/images/${opponentChoice}.png`);
-            ValidateWinner(hostChoice, opponentChoice);
             updateRecord(`/games/${currentGameKey}/hostChoice`, '');
             updateRecord(`/games/${currentGameKey}/opponentChoice`, '');
-            if (currentModality === 'one'){
-                show("endGameButton");
-            }
+            ValidateWinner(hostChoice, opponentChoice, game);
         } else if (hostChoice && isHost) {
             displayUserChoiceActions();
             setAttribute('#hostChoice', 'src', `./assets/images/${hostChoice}.png`);
@@ -117,6 +141,60 @@ function actionsUserSelection(game) {
             displayUserChoiceActions();
             setAttribute('#oponentChoice', 'src', `./assets/images/${opponentChoice}.png`);
         }
+    }
+}
+
+function actionsWinUser(game) {    
+    if (game.key === currentGameKey) {
+        var hostWins = game.val().host.wins;
+        var opponentWins = game.val().opponent.wins;
+        updateRecord(`/games/${currentGameKey}/change`, '');
+        if (currentModality === "one"){
+            show('endGameButton');    
+        } else if (currentModality === "twoOthree"){
+            if (hostWins < 2 && opponentWins < 2){
+                show('nextGameButton');
+            } else {
+                show('endGameButton');
+            }
+        } else {
+            show('nextGameButton');
+            show('endGameButton');
+        }
+        show('wins');
+        show('losts');
+        if (isHost) {
+            changeText('wins', `Your wins: ${hostWins}`);
+            changeText('losts', `Opponent wins: ${opponentWins}`);
+        } else {
+            changeText('wins', `Your wins: ${opponentWins}`);
+            changeText('losts', `Opponent wins: ${hostWins}`);
+        }
+    }
+}
+
+function userInGameDisconnected(opponentId) {
+    if (opponentId === userKey) {
+        hide('optionsDiv');
+        hide('chatArea');
+        show('selectionsDiv');
+        show('gameResults');
+        show('endGameButton');
+        printGameResult('Opponent left the game');
+    }
+}
+
+function actionsGameRemoved(game) {
+    if (game.key === currentGameKey) {
+        updateRecord(`/connections/${userKey}`, {
+            playerName,
+            available: true
+        });
+        isHost = false;
+        currentGameKey = '';
+        currentModality = '';
+        hide('gameContainer');
+        show('availableOponents');
     }
 }
 
@@ -141,11 +219,12 @@ function destroyOpponentElement(connection) {
 function createOpponentElement(connection) {
     var key = connection.key;
     var opponentDiv = $('<div>').addClass("mb-3 rowDirection").attr("data-value", key);
-    var userName = $('<span>').addClass("userAvailableName mr-5").text(connection.val().playerName);
+    var userName = $('<span>').addClass("userAvailableName mr-sm-5 mr-2").text(connection.val().playerName);
     var oneOption = $('<option>').text("One Game").attr("value", "one");
     var twoOthreeOption = $('<option>').text("Two out of three").attr("value", "twoOthree");
-    var modalitySelect = $('<select>').addClass("mr-5");
-    modalitySelect.append(oneOption, twoOthreeOption);
+    var infinite = $('<option>').text("Infinite").attr("value", "infinite");
+    var modalitySelect = $('<select>').addClass("mr-sm-5 mr-2");
+    modalitySelect.append(oneOption, twoOthreeOption, infinite);
     var playButton = $('<button>').addClass("btn btn-success").text("Play!").attr("type", "button")
         .on("click", playHandler);
     opponentDiv.append(userName, modalitySelect, playButton);
@@ -198,22 +277,32 @@ function gameCreatedAssignments(game) {
     currentModality = game.val().modality;
 }
 
-function ValidateWinner(hostChoice, enemyChoice) {
+function ValidateWinner(hostChoice, enemyChoice, game) {
+    var hostWins = game.val().host.wins;
+    var opponentWins = game.val().opponent.wins;
     var hostResult = '';
-    var opponentResult = '';
     if ((hostChoice === 'rock' && enemyChoice === 'scissors')
         || (hostChoice === 'paper' && enemyChoice === 'rock')
         || (hostChoice === 'scissors' && enemyChoice === 'paper')) {
-        hostResult = 'You win';
+        hostResult = 'You win!';
         opponentResult = 'You loose';
+        hostWins++;
     } else if (hostChoice === enemyChoice) {
-        hostResult = 'Tide Game';
-        opponentResult = 'Tide Game';
+        hostResult = 'Tie Game';
+        opponentResult = 'Tie Game';
     } else {
         hostResult = 'You lose!';
         opponentResult = 'You win';
+        opponentWins++;
     }
     isHost ? printGameResult(hostResult) : printGameResult(opponentResult);
+
+    if (hostResult === 'You win!') {
+        updateRecord(`/games/${currentGameKey}/host/wins`, hostWins)
+    } else if (hostResult === 'You lose!') {
+        updateRecord(`/games/${currentGameKey}/opponent/wins`, opponentWins)
+    }
+    updateRecord(`/games/${currentGameKey}/change`, 'wins');
 }
 
 function createGameObject(userKey, opponentKey, modality) {
@@ -223,9 +312,11 @@ function createGameObject(userKey, opponentKey, modality) {
         opponentChoice: '',
         host: {
             id: userKey,
+            wins: 0
         },
         opponent: {
             id: opponentKey,
+            wins: 0
         },
         chat: {
             isHost: false,
@@ -242,6 +333,21 @@ function displayAfterOpponentSelected() {
     show('rpsArea');
     show('chatArea');
     hide('availableOponents');
+    cleanPreviousGames();
+}
+
+function cleanPreviousGames() {
+    show('optionsDiv');
+    hide('selectionsDiv');
+    $('#chat').empty();
+    setAttribute(".selectedImage", 'src', '');
+    hide('nextGameButton');
+    hide('endGameButton')
+    changeText('gameResult', '');
+    hide('wins');
+    hide('losts');
+    changeText('wins','');
+    changeText('losts','');
 }
 
 function displayAfterEnter() {
@@ -268,4 +374,5 @@ $(document).ready(start);
 $('#playButton').on('click', enterHandler);
 $('#sendMessageButton').on('click', sendMessageHandler);
 $('#endGameButton').on('click', endGameHandler);
+$('#nextGameButton').on('click', nextGameHandler);
 $('.options').on('click', userChoiceHandler);

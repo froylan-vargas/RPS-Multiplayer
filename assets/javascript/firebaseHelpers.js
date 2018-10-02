@@ -14,6 +14,7 @@ var connectionsRef = database.ref("/connections");
 var connectedRef = database.ref(".info/connected");
 
 var userKey;
+var record;
 
 //Listeners
 //Connection Listeners
@@ -39,7 +40,12 @@ database.ref('/connections').once("value", function (snap) {
 
 //ConnectionLost
 database.ref(`/connections`).on("child_removed", function (snap) {
-    actionsConnectionLost(snap);
+    const {isUserInGame, opponentId} = getDisconnectionInfo(snap);
+    if (isUserInGame){
+         userInGameDisconnected(opponentId);
+    } else {
+        actionsConnectionLost(snap);  
+    }
 })
 
 //Games listeners
@@ -55,7 +61,14 @@ database.ref(`/games`).on("child_changed", function (snap) {
         actionsChatMessage(snap);
     } else if (change === 'game'){
         actionsUserSelection(snap);
+    } else if (change === 'wins'){
+        actionsWinUser(snap);
     }
+})
+
+//Game removed
+database.ref(`games`).on('child_removed', function (snap){
+    actionsGameRemoved(snap);
 })
 
 //Helpers
@@ -65,4 +78,15 @@ function updateRecord(query, updateElement) {
 
 function pushRecord(query, addElement) {
     database.ref(query).push(addElement);
+}
+
+function removeRecord(query){
+    database.ref(query).remove();
+}
+
+function getRecord(query){
+     database.ref(query).on("value", function(snap){
+         record = snap;
+     })
+     return record;
 }
