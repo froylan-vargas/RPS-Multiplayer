@@ -155,6 +155,7 @@ function actionsWinUser(game) {
             if (hostWins < 2 && opponentWins < 2){
                 show('nextGameButton');
             } else {
+                hide('nextGameButton')
                 show('endGameButton');
             }
         } else {
