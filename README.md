@@ -1,2 +1,3 @@
 # RPS-Multiplayer
-Multiplayer Rock Paper Scissors using Firebase
+
+**Multiplayer rock, paper, scissors using Firebase.**
