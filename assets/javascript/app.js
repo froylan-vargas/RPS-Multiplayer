@@ -165,11 +165,11 @@ function actionsWinUser(game) {
         show('wins');
         show('losts');
         if (isHost) {
-            changeText('wins', `Your wins: ${hostWins}`);
-            changeText('losts', `Opponent wins: ${opponentWins}`);
+            changeText('wins', `Wins: ${hostWins}`);
+            changeText('losts', `Loses: ${opponentWins}`);
         } else {
-            changeText('wins', `Your wins: ${opponentWins}`);
-            changeText('losts', `Opponent wins: ${hostWins}`);
+            changeText('wins', `Wins: ${opponentWins}`);
+            changeText('losts', `Loses: ${hostWins}`);
         }
     }
 }
