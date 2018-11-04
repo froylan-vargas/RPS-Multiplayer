@@ -1,5 +1,5 @@
 # RPS-Multiplayer
-Live url: https://froylandcito.github.io/RPS-Multiplayer/
+Live url: https://froylan-vargas.github.io/RPS-Multiplayer/
 
 ## Description
 Multiplayer rock, paper, scissors game 
